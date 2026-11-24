@@ -32,6 +32,39 @@ cp SKILL.md ~/.omp/agent/skills/cloudflare-deploy/SKILL.md
 
 Register the name in `~/.omp/agent/config.yml` under `skills.includeSkills`, plus the directory `~/.omp/agent/skills/cloudflare-deploy/`. Other agents read the same `SKILL.md` from their own skills directory.
 
+## Prompt for a new project
+
+Paste this into your agent after cloning a repo that is not deployed by GitHub Actions yet. Replace the two placeholders.
+
+```
+Pakai skill cloudflare-deploy untuk repo ini.
+
+Target deploy: <NAMA_PROJECT> → <DOMAIN>
+Account ID: <ACCOUNT_ID>
+Token Cloudflare sudah ada di secret repo lain; jangan minta token baru.
+
+Yang harus kamu lakukan:
+1. Baca stack repo ini, lalu pilih mekanisme sesuai SKILL.md
+   (Workers Builds / GitHub Actions / Pages). Jelaskan pilihanmu dalam satu baris.
+2. Kalau GitHub Actions: ambil template yang cocok dari
+   https://github.com/AmmarArief/cloudflare-deploy/tree/main/templates,
+   tulis ke .github/workflows/deploy.yml, sesuaikan nama DB D1 dan script
+   build repo ini.
+3. Daftarkan CLOUDFLARE_API_TOKEN dan CLOUDFLARE_ACCOUNT_ID sebagai secret repo.
+4. Jangan commit sebelum build lokal sama dengan command di workflow lolos.
+5. Push, pantau sampai run hijau, lalu buktikan URL live balas 200 dan
+   isinya build baru.
+```
+
+Untuk repo yang sudah punya workflow tapi gagal deploy:
+
+```
+Pakai skill cloudflare-deploy. Deploy repo ini gagal di run <RUN_ID>.
+Cari penyebabnya dari log, perbaiki, lalu buktikan dengan push-triggered run
+yang hijau dan URL live yang menampilkan perubahan.
+```
+
+
 ## What the pipeline covers
 
 - Build cache (`pnpm`), frozen lockfile
