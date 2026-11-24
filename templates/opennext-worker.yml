@@ -1,0 +1,30 @@
+# Next.js + OpenNext on Workers
+name: Deploy to Cloudflare Workers
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check-types
+      - run: pnpm test
+      - run: pnpm exec opennextjs-cloudflare build
+      - run: pnpm exec wrangler d1 migrations apply <DB_NAME> --remote   # drop if no D1
+      - run: pnpm exec opennextjs-cloudflare deploy
